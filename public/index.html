@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Enterprise MFE Practice</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      window.__themeConfig = null;
+
+      (async function () {
+        const hostWithPort = window.location.host;
+        const location = window.location.href;
+        let faviconLink = '';
+        if (['login', 'verify'].some((path) => location.includes(path))) {
+          const params = new URLSearchParams(window.location.search);
+          const slug = params.get('slug'); //
+          const BUCKET_BASE = '<%= API_URL %>';
+
+          const themeUrl = `${BUCKET_BASE}/brands/slug/${slug || 'default'}`;
+          const res = await fetch(themeUrl, { cache: 'no-store' });
+          const { data } = await res.json();
+          window.__themeConfig = data;
+          localStorage.setItem('tenantBrand', JSON.stringify(data));
+        }
+        let link = document.querySelector("link[rel~='icon']");
+        if (!link) {
+          link = document.createElement('link');
+          link.rel = 'icon';
+          document.head.appendChild(link);
+        }
+        const tenantBrand = JSON.parse(
+          localStorage.getItem('tenantBrand') || '{}',
+        );
+        link.href = tenantBrand.favIconUrl || '/favicon.ico';
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="host-root"></div>
+  </body>
+</html>
