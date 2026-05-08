@@ -1,42 +1,69 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+
+import { brand$, getCurrentBrand, setBrand } from 'enterprise_data/Brand';
 import {
   useLazyGetBrandByIdQuery,
   useLazyGetBrandBySlugQuery,
 } from 'enterprise_data/BrandApi';
-import { useAuth } from './use-auth';
+
 import { Brand } from '../types/brand';
-import { useLocation } from 'react-router-dom';
+import { useAuth } from './use-auth';
+import { resolveBrandSlugFromUrl } from '../utils/resolveBrandSlugFromUrl';
 
-export function useBrand() {
+export const useBrand = () => {
   const { user } = useAuth();
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const slug = queryParams.get('slug');
-  const [fetchBrandConfig] = useLazyGetBrandByIdQuery();
-  const [fetchBrandBySlug] = useLazyGetBrandBySlugQuery();
-  const [tenantTheme, setTenantTheme] = useState<Brand | undefined>(undefined);
 
-  const fetchBrand = useCallback(async () => {
-    try {
-      if (user?.tenantId) {
-        const { data } = await fetchBrandConfig(user?.tenantId).unwrap();
-        localStorage.setItem('tenantBrand', JSON.stringify(data));
-        setTenantTheme(data);
-      } else {
-        const { data } = await fetchBrandBySlug(slug || 'default').unwrap();
-        localStorage.setItem('tenantBrand', JSON.stringify(data));
-        setTenantTheme(data);
-      }
-    } catch (error) {
-      console.error('Error fetching brand config:', error);
-    }
-  }, [fetchBrandConfig, user?.tenantId]);
+  const [fetchBrandByTenantId] = useLazyGetBrandByIdQuery();
+  const [fetchBrandBySlug] = useLazyGetBrandBySlugQuery();
+
+  const [brand, setBrandState] = useState<Brand | null>(() =>
+    getCurrentBrand(),
+  );
 
   useEffect(() => {
-    if (!tenantTheme) {
-      fetchBrand();
-    }
-  }, [fetchBrand, user?.tenantId, tenantTheme]);
+    const subscription = brand$.subscribe((nextBrand: Brand | null) => {
+      setBrandState(nextBrand);
+    });
 
-  return { tenantTheme, getBrandConfig: fetchBrand };
-}
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const previewBrand = useCallback((modifiedBrand: Brand) => {
+    setBrand(modifiedBrand);
+  }, []);
+
+  const refreshBrand = useCallback(async () => {
+    try {
+      if (user?.tenantId) {
+        const response = await fetchBrandByTenantId(user.tenantId).unwrap();
+
+        const brandData = 'data' in response ? response.data : response;
+
+        setBrand(brandData);
+
+        return brandData;
+      }
+
+      const slug = resolveBrandSlugFromUrl() || 'default';
+
+      const response = await fetchBrandBySlug(slug).unwrap();
+
+      const brandData = 'data' in response ? response.data : response;
+
+      setBrand(brandData);
+
+      return brandData;
+    } catch (error) {
+      console.error('Error fetching brand config:', error);
+      return null;
+    }
+  }, [fetchBrandByTenantId, fetchBrandBySlug, user?.tenantId]);
+
+  return {
+    brand,
+    previewBrand,
+    refreshBrand,
+  };
+};

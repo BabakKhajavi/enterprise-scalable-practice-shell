@@ -5,33 +5,127 @@
     <title>Enterprise MFE Practice</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script>
-      window.__themeConfig = null;
+      window.__brandConfig = null;
 
-      (async function () {
-        const hostWithPort = window.location.host;
-        const location = window.location.href;
-        let faviconLink = '';
-        if (['login', 'verify'].some((path) => location.includes(path))) {
+      window.__brandReady = (async function () {
+        const API_BASE_URL = '<%= API_URL %>';
+
+        const AUTH_PATHS = ['/login', '/verify', '/signup', '/reset-password'];
+
+        function isAuthPage() {
+          return AUTH_PATHS.some(function (path) {
+            return window.location.pathname.includes(path);
+          });
+        }
+
+        function isLocalhost() {
+          const hostname = window.location.hostname;
+
+          return (
+            hostname === 'localhost' ||
+            hostname === '127.0.0.1' ||
+            hostname.includes('localhost')
+          );
+        }
+
+        function getBrandSlug() {
           const params = new URLSearchParams(window.location.search);
-          const slug = params.get('slug'); //
-          const BUCKET_BASE = '<%= API_URL %>';
+          const slugFromQuery = params.get('slug') || params.get('brand');
 
-          const themeUrl = `${BUCKET_BASE}/brands/slug/${slug || 'default'}`;
-          const res = await fetch(themeUrl, { cache: 'no-store' });
-          const { data } = await res.json();
-          window.__themeConfig = data;
-          localStorage.setItem('tenantBrand', JSON.stringify(data));
+          if (slugFromQuery) {
+            return slugFromQuery;
+          }
+
+          if (isLocalhost()) {
+            return 'default';
+          }
+
+          const hostname = window.location.hostname;
+          const subdomain = hostname.split('.')[0];
+
+          const ignoredSubdomains = ['www', 'app', 'stage', 'dev'];
+
+          if (!subdomain || ignoredSubdomains.includes(subdomain)) {
+            return 'default';
+          }
+
+          return subdomain;
         }
-        let link = document.querySelector("link[rel~='icon']");
-        if (!link) {
-          link = document.createElement('link');
-          link.rel = 'icon';
-          document.head.appendChild(link);
+
+        function applyBrandToDocument(brand) {
+          if (!brand) return;
+
+          let link = document.querySelector("link[rel~='icon']");
+
+          if (!link) {
+            link = document.createElement('link');
+            link.rel = 'icon';
+            document.head.appendChild(link);
+          }
+
+          link.href = brand.favIconUrl || '/favicon.ico';
+
+          if (brand.colors) {
+            Object.keys(brand.colors).forEach(function (key) {
+              document.documentElement.style.setProperty(
+                '--zl-' + key,
+                brand.colors[key],
+              );
+            });
+          }
+
+          if (brand.fontFamily) {
+            document.documentElement.style.setProperty(
+              '--zl-font-family',
+              brand.fontFamily,
+            );
+
+            document.documentElement.style.fontFamily = brand.fontFamily;
+
+            if (document.body) {
+              document.body.style.fontFamily = brand.fontFamily;
+            }
+          }
         }
-        const tenantBrand = JSON.parse(
-          localStorage.getItem('tenantBrand') || '{}',
-        );
-        link.href = tenantBrand.favIconUrl || '/favicon.ico';
+
+        async function fetchBrandBySlug(slug) {
+          const response = await fetch(
+            API_BASE_URL +
+              '/brands/slug/' +
+              encodeURIComponent(slug || 'default'),
+            {
+              method: 'GET',
+              cache: 'no-store',
+              headers: {
+                Accept: 'application/json',
+              },
+            },
+          );
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch brand by slug: ' + slug);
+          }
+
+          const json = await response.json();
+
+          return json.data || json;
+        }
+
+        try {
+          const shouldPreloadBrand = isAuthPage() || isLocalhost();
+
+          if (!shouldPreloadBrand) {
+            return;
+          }
+
+          const slug = getBrandSlug();
+          const brand = await fetchBrandBySlug(slug);
+
+          window.__brandConfig = brand;
+          applyBrandToDocument(brand);
+        } catch (error) {
+          console.error('Pre-React brand load failed:', error);
+        }
       })();
     </script>
   </head>
