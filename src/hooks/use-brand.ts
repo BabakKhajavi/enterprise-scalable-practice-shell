@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { brand$, getCurrentBrand, setBrand } from 'enterprise_data/Brand';
 import {
-  useLazyGetBrandByIdQuery,
+  useLazyGetBrandByTenantIdQuery,
   useLazyGetBrandBySlugQuery,
 } from 'enterprise_data/BrandApi';
 
@@ -13,7 +13,7 @@ import { resolveBrandSlugFromUrl } from '../utils/resolveBrandSlugFromUrl';
 export const useBrand = () => {
   const { user } = useAuth();
 
-  const [fetchBrandByTenantId] = useLazyGetBrandByIdQuery();
+  const [fetchBrandByTenantId] = useLazyGetBrandByTenantIdQuery();
   const [fetchBrandBySlug] = useLazyGetBrandBySlugQuery();
 
   const [brand, setBrandState] = useState<Brand | null>(() =>
@@ -51,7 +51,6 @@ export const useBrand = () => {
       const response = await fetchBrandBySlug(slug).unwrap();
 
       const brandData = 'data' in response ? response.data : response;
-
       setBrand(brandData);
 
       return brandData;

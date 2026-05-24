@@ -106,7 +106,7 @@ export const GlobalAppBar: FC<AppBarProps & { toggleSidebar: () => void }> = ({
   isOverlay,
   toggleSidebar,
 }) => {
-  const { tenantTheme } = useBrand();
+  const { brand } = useBrand();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { user, signOut } = useAuth();
@@ -202,7 +202,7 @@ export const GlobalAppBar: FC<AppBarProps & { toggleSidebar: () => void }> = ({
             width: '100%',
           }}
         >
-          <OptimizedImage src={tenantTheme?.logoUrl} alt="Hero" height="40px" />
+          <OptimizedImage src={brand?.logoUrl} alt="Hero" height="40px" />
         </Box>
         <Stack
           direction="row"
@@ -299,9 +299,7 @@ export const GlobalAppBar: FC<AppBarProps & { toggleSidebar: () => void }> = ({
           <MenuItem onClick={handleCloseProfileMenu}>Profile</MenuItem>
           <MenuItem onClick={handleCloseProfileMenu}>My account</MenuItem>
           <Divider />
-          <MenuItem onClick={() => signOut(tenantTheme as Brand)}>
-            Sign out
-          </MenuItem>
+          <MenuItem onClick={() => signOut(brand as Brand)}>Sign out</MenuItem>
         </Menu>
       </Popover>
     </AppBar>

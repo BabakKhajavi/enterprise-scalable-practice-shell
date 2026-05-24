@@ -8,14 +8,6 @@ import { AppThemeProvider } from './providers/theme-provider';
 import { store } from 'enterprise_data/Store';
 import { GlobalToastContainer } from 'enterprise_ui/molecules';
 import { setBrand } from 'enterprise_data/Brand';
-import { Brand } from './types/brand';
-
-declare global {
-  interface Window {
-    __brandConfig?: Brand;
-    __POWERED_BY_SHELL__?: boolean;
-  }
-}
 
 window.__POWERED_BY_SHELL__ = true;
 

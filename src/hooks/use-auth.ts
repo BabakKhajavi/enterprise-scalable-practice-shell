@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  useLazyRegularSignUpQuery,
-  useLazyRegularLoginQuery,
-  useLazyVerifyOtpQuery,
+  useRegularSignUpMutation,
+  useRegularLoginMutation,
+  useVerifyOtpMutation,
 } from 'enterprise_data/AuthApi';
 import { auth$, authActions } from 'enterprise_data/Auth';
 
@@ -18,9 +18,9 @@ import { AppPaths } from '../types/app-path';
 
 export function useAuth() {
   const navigate = useNavigate();
-  const [regularSignUp, regularSignUpState] = useLazyRegularSignUpQuery();
-  const [regularLogin, regularLoginState] = useLazyRegularLoginQuery();
-  const [verifyOtpFn, verifyOtpState] = useLazyVerifyOtpQuery();
+  const [regularSignUp, regularSignUpState] = useRegularSignUpMutation();
+  const [regularLogin, regularLoginState] = useRegularLoginMutation();
+  const [verifyOtpFn, verifyOtpState] = useVerifyOtpMutation();
   // Local state for auth
   const [authState, setAuthState] = useState<{
     user: User;
@@ -73,14 +73,15 @@ export function useAuth() {
     [verifyOtpFn],
   );
 
-  const signOut: (tenantTheme: Brand) => void = useCallback(
-    (tenantTheme: Brand) => {
+  const signOut: (brand: Brand) => void = useCallback(
+    (brand: Brand) => {
       authActions.logout();
-      if (tenantTheme?.slug.toLowerCase() === 'default') {
+
+      if (brand?.slug.toLowerCase() === 'default') {
         navigate(AppPaths.LOGIN);
         return;
       }
-      const slug = tenantTheme?.slug;
+      const slug = brand?.slug;
       navigate(
         {
           pathname: AppPaths.LOGIN,

@@ -45,7 +45,6 @@ type Props = {
 
 export const AppThemeProvider: React.FC<Props> = ({ children }) => {
   const { brand: brandFromRxjs } = useBrand();
-
   const brand = useMemo(() => {
     return brandFromRxjs ?? window.__brandConfig ?? fallbackBrand;
   }, [brandFromRxjs]);
