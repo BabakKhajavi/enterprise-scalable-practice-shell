@@ -9,19 +9,7 @@ import Divider from '@mui/material/Divider';
 import Box from '@mui/material/Box';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { OptimizedImage } from 'enterprise_ui/atoms';
-import {
-  BarChart3,
-  ChevronDown,
-  ChevronUp,
-  Cog,
-  GitBranch,
-  LayoutDashboard,
-  Mail,
-  Sparkles,
-  Users,
-  CheckSquare,
-  Receipt,
-} from 'lucide-react';
+import { ChevronDown, ChevronUp, LayoutDashboard } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useTheme, useMediaQuery } from '@mui/material';
 import { AppPaths } from '../../../types/app-path';
@@ -44,8 +32,6 @@ interface SidebarGroup {
   title: string;
   items: SidebarSection[];
 }
-
-const makeSubRoutes = (routes: SidebarSubRoutes) => routes;
 
 export const GlobalSidebar: React.FC<SidebarProps> = ({ expanded }) => {
   const { brand } = useBrand();
