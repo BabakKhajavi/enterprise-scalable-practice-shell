@@ -1,7 +1,7 @@
 import { createTheme, ThemeOptions, Theme } from '@mui/material/styles';
 import { Brand } from '../types/brand';
 
-export type TenantThemeConfig = ThemeOptions;
+export type brandConfig = ThemeOptions;
 
 export function createAppTheme(tenantBrand: Brand): Theme {
   return createTheme({

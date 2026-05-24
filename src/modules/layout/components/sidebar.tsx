@@ -48,7 +48,7 @@ interface SidebarGroup {
 const makeSubRoutes = (routes: SidebarSubRoutes) => routes;
 
 export const GlobalSidebar: React.FC<SidebarProps> = ({ expanded }) => {
-  const { tenantTheme } = useBrand();
+  const { brand } = useBrand();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
@@ -63,140 +63,6 @@ export const GlobalSidebar: React.FC<SidebarProps> = ({ expanded }) => {
             items: [] as string[],
             icon: LayoutDashboard,
             route: AppPaths.Dashboard,
-          },
-        ],
-      },
-      {
-        title: 'Apps',
-        items: [
-          {
-            label: 'Leads',
-            items: ['All Leads', 'Add Lead', 'Imports', 'Duplicates'],
-            icon: Users,
-            route: AppPaths.Leads,
-            subRoutes: makeSubRoutes({
-              'All Leads': AppPaths.LeadsAll,
-              'Add Lead': AppPaths.LeadsAdd,
-              Imports: AppPaths.LeadsImports,
-              Duplicates: AppPaths.LeadsDuplicates,
-            }),
-          },
-          {
-            label: 'Pipelines',
-            items: [
-              'Active Pipelines',
-              'Templates',
-              'Stage History',
-              'Tracker / Reruns',
-            ],
-            icon: GitBranch,
-            route: AppPaths.Pipelines,
-            subRoutes: makeSubRoutes({
-              'Active Pipelines': AppPaths.PipelinesActive,
-              Templates: AppPaths.PipelinesTemplates,
-              'Stage History': AppPaths.PipelinesStageHistory,
-              'Tracker / Reruns': AppPaths.PipelinesTrackerReruns,
-            }),
-          },
-          {
-            label: 'Tasks',
-            items: ['My Tasks', 'Team Tasks', 'Tags', 'Notes'],
-            icon: CheckSquare,
-            route: AppPaths.Tasks,
-            subRoutes: makeSubRoutes({
-              'My Tasks': AppPaths.TasksMy,
-              'Team Tasks': AppPaths.TasksTeam,
-              Tags: AppPaths.TasksTags,
-              Notes: AppPaths.TasksNotes,
-            }),
-          },
-          {
-            label: 'Automations',
-            items: [
-              'My Automations',
-              'Templates',
-              'Runs / History',
-              'Triggers',
-            ],
-            icon: Sparkles,
-            route: AppPaths.Automations,
-            subRoutes: makeSubRoutes({
-              'My Automations': AppPaths.AutomationsMine,
-              Templates: AppPaths.AutomationsTemplates,
-              'Runs / History': AppPaths.AutomationsRunsHistory,
-              Triggers: AppPaths.AutomationsTriggers,
-            }),
-          },
-          {
-            label: 'Communications',
-            items: ['Direct Email', 'Scheduled', 'History', 'Templates'],
-            icon: Mail,
-            route: AppPaths.Communications,
-            subRoutes: makeSubRoutes({
-              'Direct Email': AppPaths.CommunicationsDirectEmail,
-              Scheduled: AppPaths.CommunicationsScheduled,
-              History: AppPaths.CommunicationsHistory,
-              Templates: AppPaths.CommunicationsTemplates,
-            }),
-          },
-          {
-            label: 'Reports',
-            items: [
-              'Overview',
-              'Lead Volume',
-              'Leads by Stage',
-              'Leads by Source',
-              'Upcoming Tasks',
-              'Activity',
-            ],
-            icon: BarChart3,
-            route: AppPaths.Reports,
-            subRoutes: makeSubRoutes({
-              Overview: AppPaths.ReportsOverview,
-              'Lead Volume': AppPaths.ReportsLeadVolume,
-              'Leads by Stage': AppPaths.ReportsLeadsByStage,
-              'Leads by Source': AppPaths.ReportsLeadsBySource,
-              'Upcoming Tasks': AppPaths.ReportsUpcomingTasks,
-              Activity: AppPaths.ReportsActivity,
-            }),
-          },
-        ],
-      },
-      {
-        title: 'Profile',
-        items: [
-          {
-            label: 'Settings',
-            items: [
-              'Team & Agents',
-              'Invitations',
-              'Roles & Permissions',
-              'Branding',
-              'Integrations',
-              'Lead Assignment',
-              'Notifications',
-              'Company Info',
-              'Email Settings',
-            ],
-            icon: Cog,
-            route: AppPaths.SETTINGS,
-            subRoutes: makeSubRoutes({
-              'Team & Agents': AppPaths.TEAMS_AGENTS,
-              Invitations: AppPaths.INVITATIONS,
-              'Roles & Permissions': AppPaths.ROLES_PERMISSION,
-              Branding: AppPaths.BRANDING,
-              Integrations: AppPaths.INTEGRATIONS,
-              'Lead Assignment': AppPaths.LEAD_ASSIGNMENT,
-              Notifications: AppPaths.NOTIFICATIONS,
-              'Company Info': AppPaths.COMPANY_INFO,
-              'Email Settings': AppPaths.EMAIL_SETTINGS,
-            }),
-          },
-          {
-            label: 'Billing',
-            items: [] as string[],
-            icon: Receipt,
-            route: AppPaths.BILLING,
           },
         ],
       },
@@ -279,7 +145,7 @@ export const GlobalSidebar: React.FC<SidebarProps> = ({ expanded }) => {
         }}
       >
         <OptimizedImage
-          src={expanded ? tenantTheme?.logoUrl : tenantTheme?.smallLogoUrl}
+          src={expanded ? brand?.logoUrl : brand?.smallLogoUrl}
           alt="Hero"
           height="40px"
           priority="high"
